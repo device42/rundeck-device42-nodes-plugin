@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: apache-log4j:apache-log4j:1.2.15">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/third-party/apache-log4j-1.2.15/apache-log4j-1.2.15.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

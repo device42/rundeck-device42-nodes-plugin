@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.rundeck:rundeck-core:2.2.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.rundeck/rundeck-core/2.2.2/17dd82d4976e37073e54fe6a43e3bf0f7254169b/rundeck-core-2.2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.rundeck/rundeck-core/2.2.2/6a6259a7ede2cb0045780e44e66e9d925bd88daf/rundeck-core-2.2.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

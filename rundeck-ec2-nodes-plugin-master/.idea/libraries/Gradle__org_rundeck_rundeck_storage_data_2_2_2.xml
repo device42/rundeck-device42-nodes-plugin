@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.rundeck:rundeck-storage-data:2.2.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.rundeck/rundeck-storage-data/2.2.2/184fca847ca7481a0cba41a2dae3aa13cdf369cf/rundeck-storage-data-2.2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.rundeck/rundeck-storage-data/2.2.2/933010fb515263689acb2966d9dc1ee7678407f6/rundeck-storage-data-2.2.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
