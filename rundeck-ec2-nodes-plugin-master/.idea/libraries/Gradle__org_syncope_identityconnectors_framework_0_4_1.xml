@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.syncope.identityconnectors:framework:0.4.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.syncope.identityconnectors/framework/0.4.1/769ff2040cfc3d71ca2d3b1e6e4549186c64e3f9/framework-0.4.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.syncope.identityconnectors/framework/0.4.1/59df627a62f44b36efa397c9a2b4a69d0e629998/framework-0.4.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

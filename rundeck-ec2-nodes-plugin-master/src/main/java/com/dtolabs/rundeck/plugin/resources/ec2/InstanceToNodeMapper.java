@@ -23,8 +23,8 @@
 */
 package com.dtolabs.rundeck.plugin.resources.ec2;
 
-import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.ec2.AmazonEC2AsyncClient;
 import com.amazonaws.services.ec2.AmazonEC2Client;

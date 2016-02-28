@@ -1,9 +1,11 @@
 package com.device42.client.services;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.Map;
-
+import com.device42.client.parser.BasicErrorJsonParser;
+import com.device42.client.parser.JsonObjectParser;
+import com.device42.client.parser.JsonParser;
+import com.device42.client.services.parameters.EmptyInputParameters;
+import com.device42.client.services.parameters.InputParameters;
+import com.device42.client.util.Device42ClientException;
 import org.apache.http.HttpHost;
 import org.apache.http.StatusLine;
 import org.apache.http.client.AuthCache;
@@ -18,12 +20,9 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.device42.client.parser.BasicErrorJsonParser;
-import com.device42.client.parser.JsonObjectParser;
-import com.device42.client.parser.JsonParser;
-import com.device42.client.services.parameters.EmptyInputParameters;
-import com.device42.client.services.parameters.InputParameters;
-import com.device42.client.util.Device42ClientException;
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.Map;
 
 abstract class AbstractAsynchronousRestClient implements Closeable {
     private static Logger logger = Logger.getLogger(AbstractAsynchronousRestClient.class);

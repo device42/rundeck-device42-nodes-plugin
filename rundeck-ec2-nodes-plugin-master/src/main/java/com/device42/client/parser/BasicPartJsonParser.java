@@ -1,10 +1,9 @@
 package com.device42.client.parser;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-
 import com.device42.client.model.Part;
 import com.device42.client.util.JsonUtil;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 public class BasicPartJsonParser implements JsonObjectParser<Part> {
     @Override

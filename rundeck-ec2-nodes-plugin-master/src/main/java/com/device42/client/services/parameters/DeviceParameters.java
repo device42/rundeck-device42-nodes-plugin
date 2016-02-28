@@ -1,13 +1,12 @@
 package com.device42.client.services.parameters;
 
+import com.device42.client.util.Device42ClientException;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.device42.client.util.Device42ClientException;
 
 public class DeviceParameters implements InputParameters {
     public static class DeviceParametersBuilder {

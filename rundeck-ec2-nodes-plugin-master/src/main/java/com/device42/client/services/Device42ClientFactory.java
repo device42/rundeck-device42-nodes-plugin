@@ -1,16 +1,6 @@
 package com.device42.client.services;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-
+import com.device42.client.util.Device42ClientException;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.auth.AuthScope;
@@ -26,7 +16,15 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
 import org.apache.log4j.Logger;
 
-import com.device42.client.util.Device42ClientException;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.List;
 
 public class Device42ClientFactory {
     private static Logger logger = Logger.getLogger(Device42ClientFactory.class);

@@ -1,13 +1,12 @@
 package com.device42.client.services;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.http.impl.client.CloseableHttpClient;
-
 import com.device42.client.model.PDU;
 import com.device42.client.parser.BasicPDUsJsonParser;
 import com.device42.client.services.parameters.PDUParameters;
+import org.apache.http.impl.client.CloseableHttpClient;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class PDUsRestClient extends AbstractAsynchronousRestClient {
     private BasicPDUsJsonParser pdusJsonParser = new BasicPDUsJsonParser();

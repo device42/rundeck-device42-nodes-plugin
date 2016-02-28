@@ -1,13 +1,12 @@
 package com.device42.client.services;
 
-import java.util.List;
-
-import org.apache.http.impl.client.CloseableHttpClient;
-
 import com.device42.client.model.Device;
 import com.device42.client.parser.BasicDeviceJsonParser;
 import com.device42.client.parser.BasicDevicesJsonParser;
 import com.device42.client.services.parameters.DeviceParameters;
+import org.apache.http.impl.client.CloseableHttpClient;
+
+import java.util.List;
 
 public class DevicesRestClient extends AbstractAsynchronousRestClient {
     private BasicDeviceJsonParser deviceJsonParser = new BasicDeviceJsonParser();

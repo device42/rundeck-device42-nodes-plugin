@@ -70,6 +70,8 @@ dependencies {
     pluginLibs 'org.codehaus.jettison:jettison:1.3.7'
     pluginLibs 'commons-codec:commons-codec:1.9'
     pluginLibs 'org.apache.commons:commons-lang3:3.4'
+    pluginLibs 'org.syncope.identityconnectors:framework:0.4.1'
+
 }
 
 // task to copy plugin libs to output/lib dir

@@ -10,6 +10,7 @@ import com.dtolabs.rundeck.core.common.INodeSet;
 import com.dtolabs.rundeck.core.common.NodeEntryImpl;
 import com.dtolabs.rundeck.core.common.NodeSetImpl;
 import org.apache.log4j.Logger;
+import org.identityconnectors.common.security.GuardedString;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,13 +31,17 @@ public class DeviceToNodeMapper {
     private String endpoint;
     private boolean runningStateOnly = true;
     private Properties mapping;
+    private String username;
+    private String  password;
 
     /**
      /**
      * Create with the credentials and mapping definition
      */
-    DeviceToNodeMapper(final Properties mapping) {
+    DeviceToNodeMapper(final Properties mapping, String username, String password) {
         this.mapping = mapping;
+        this.username = username;
+        this.password = password;
     }
 
     /**
@@ -95,10 +100,21 @@ public class DeviceToNodeMapper {
     }
 
     private List<Device> query() {
-        DevicesRestClient client = Device42ClientFactory.createDeviceClient("https://svnow01.device42.com", "admin", "adm!nd42");
-        return client.getDevices(new DeviceParameters.DeviceParametersBuilder().parameter("tags","rundeck").parameter("include_cols","name,ip_addresses,device_id").build());
+        DevicesRestClient client = Device42ClientFactory.createDeviceClient("https://svnow01.device42.com", username,password);
+        return client.getDevices(new DeviceParameters.DeviceParametersBuilder().parameter("tags","rundeck").parameter("include_cols","name,ip_addresses,device_id,tags").build());
     }
 
+
+    private String decryptToString(GuardedString string) {
+        final StringBuilder buf = new StringBuilder();
+        string.access(
+                new GuardedString.Accessor() {
+                    public void access(char [] chars) {
+                        buf.append(chars);
+                    }
+                });
+        return buf.toString();
+    }
 
     private void mapInstances(final NodeSetImpl nodeSet, final List<Device> instances) {
         for (Device inst : instances) {

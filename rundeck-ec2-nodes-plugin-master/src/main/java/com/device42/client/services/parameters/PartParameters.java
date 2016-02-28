@@ -1,9 +1,9 @@
 package com.device42.client.services.parameters;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class PartParameters implements InputParameters {
     public static class PartParametersBuilder {

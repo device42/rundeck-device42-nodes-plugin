@@ -1,12 +1,11 @@
 package com.device42.client.services;
 
-import java.util.List;
-
-import org.apache.http.impl.client.CloseableHttpClient;
-
 import com.device42.client.model.Part;
 import com.device42.client.parser.BasicPartsJsonParser;
 import com.device42.client.services.parameters.PartParameters;
+import org.apache.http.impl.client.CloseableHttpClient;
+
+import java.util.List;
 
 public class PartsRestClient extends AbstractAsynchronousRestClient {
     private BasicPartsJsonParser partsJsonParser = new BasicPartsJsonParser();

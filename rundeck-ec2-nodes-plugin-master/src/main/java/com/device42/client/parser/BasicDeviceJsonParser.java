@@ -1,11 +1,10 @@
 package com.device42.client.parser;
 
+import com.device42.client.model.Device;
 import com.device42.client.model.IP;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-
-import com.device42.client.model.Device;
-import org.codehaus.jettison.json.JSONArray;
 
 import java.util.ArrayList;
 

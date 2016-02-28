@@ -1,13 +1,12 @@
 package com.device42.client.parser;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.device42.client.model.Part;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.device42.client.model.Part;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BasicPartsJsonParser implements JsonObjectParser<List<Part>> {
     private BasicPartJsonParser partJsonParser = new BasicPartJsonParser();

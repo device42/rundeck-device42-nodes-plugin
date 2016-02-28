@@ -25,9 +25,6 @@ package com.dtolabs.rundeck.plugin.resources.ec2;
 
 import com.device42.client.model.Device;
 import com.device42.client.model.IP;
-import com.device42.client.services.Device42ClientFactory;
-import com.device42.client.services.DevicesRestClient;
-import com.device42.client.services.parameters.DeviceParameters;
 import com.dtolabs.rundeck.core.common.Framework;
 import com.dtolabs.rundeck.core.plugins.Plugin;
 import com.dtolabs.rundeck.core.plugins.configuration.*;
@@ -36,7 +33,10 @@ import com.dtolabs.rundeck.core.resources.ResourceModelSourceFactory;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * EC2ResourceModelSourceFactory is the factory that can create a {@link ResourceModelSource} based on a configuration.
@@ -52,17 +52,17 @@ import java.util.*;
  *
  * @author Greg Schueler <a href="mailto:greg@dtosolutions.com">greg@dtosolutions.com</a>
  */
-@Plugin(name = "aws-ec2", service = "ResourceModelSource")
+@Plugin(name = "d42", service = "ResourceModelSource")
 public class EC2ResourceModelSourceFactory implements ResourceModelSourceFactory, Describable {
-    public static final String PROVIDER_NAME = "aws-ec2";
+    public static final String PROVIDER_NAME = "d42";
     private Framework framework;
 
     public static final String ENDPOINT = "endpoint";
     public static final String FILTER_PARAMS = "filter";
     public static final String MAPPING_PARAMS = "mappingParams";
     public static final String RUNNING_ONLY = "runningOnly";
-    public static final String ACCESS_KEY = "accessKey";
-    public static final String SECRET_KEY = "secretKey";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
     public static final String MAPPING_FILE = "mappingFile";
     public static final String REFRESH_INTERVAL = "refreshInterval";
     public static final String USE_DEFAULT_MAPPING = "useDefaultMapping";
@@ -76,8 +76,8 @@ public class EC2ResourceModelSourceFactory implements ResourceModelSourceFactory
 
     public EC2ResourceModelSourceFactory(final Framework framework) {
         this.framework = framework;
-        DevicesRestClient client = Device42ClientFactory.createDeviceClient("https://svnow01.device42.com", "admin", "adm!nd42");
-        list = client.getDevices(new DeviceParameters.DeviceParametersBuilder().parameter("tags","rundeck").build());
+        //DevicesRestClient client = Device42ClientFactory.createDeviceClient("https://svnow01.device42.com", "admin", "adm!nd42");
+        //list = client.getDevices(new DeviceParameters.DeviceParametersBuilder().parameter("tags","rundeck").build());
     }
 
     public ResourceModelSource createResourceModelSource(final Properties properties) throws ConfigurationException {
@@ -94,14 +94,7 @@ public class EC2ResourceModelSourceFactory implements ResourceModelSourceFactory
         return list;
     }
 
-    public static List<IP> getIP(String device){
-        List<IP> mlist = new ArrayList<IP>();
-        for(Device d : list){
-            if(d.getName().equalsIgnoreCase(device))
-                mlist = d.getIps();
-        }
-        return mlist;
-    }
+
 
 
 
@@ -110,13 +103,13 @@ public class EC2ResourceModelSourceFactory implements ResourceModelSourceFactory
                 .name(PROVIDER_NAME)
                 .title("Rundeck Resources")
                 .description("Devices from d42")
-                .property(PropertyUtil.select(SERVER_LIST,"Avaiable Servers","", true, "abc", getDeviceNames(list)))
-                .property(PropertyUtil.string(ACCESS_KEY, "Access Key", "AWS Access Key", false, null))
+               // .property(PropertyUtil.select(SERVER_LIST,"Avaiable Servers","", true, "abc", getDeviceNames(list)))
+                .property(PropertyUtil.string(USERNAME, "Username", "D42 console username", false, null))
                 .property(
                         PropertyUtil.string(
-                                SECRET_KEY,
-                                "Secret Key",
-                                "AWS Secret Key, required if Access Key is used. If not used, then the IAM profile will be used",
+                                PASSWORD,
+                                "Password",
+                                "D42 console password",
                                 false,
                                 null,
                                 null,
@@ -126,7 +119,7 @@ public class EC2ResourceModelSourceFactory implements ResourceModelSourceFactory
                 )
                 .property(PropertyUtil.integer(REFRESH_INTERVAL, "Refresh Interval",
                         "Minimum time in seconds between API requests to AWS (default is 30)", false, "30"))
-                .property(PropertyUtil.string(FILTER_PARAMS, "Filter Params", "AWS EC2 filters", false, null))
+                .property(PropertyUtil.string(FILTER_PARAMS, "Filter Params", "D42 filter params", false, null))
                 .property(PropertyUtil.string(MAPPING_PARAMS, "Mapping Params",
                         "Property mapping definitions. Specify multiple mappings in the form " +
                                 "\"attributeName.selector=selector\" or \"attributeName.default=value\", " +

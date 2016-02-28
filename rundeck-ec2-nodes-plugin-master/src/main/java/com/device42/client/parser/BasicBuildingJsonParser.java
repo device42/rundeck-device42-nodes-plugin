@@ -1,9 +1,8 @@
 package com.device42.client.parser;
 
+import com.device42.client.model.Building;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-
-import com.device42.client.model.Building;
 
 public class BasicBuildingJsonParser implements JsonObjectParser<Building> {
     @Override

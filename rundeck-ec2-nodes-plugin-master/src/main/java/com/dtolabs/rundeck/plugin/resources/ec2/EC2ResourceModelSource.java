@@ -23,17 +23,24 @@
 */
 package com.dtolabs.rundeck.plugin.resources.ec2;
 
-import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.dtolabs.rundeck.core.common.*;
+import com.device42.client.model.Device;
+import com.device42.client.model.IP;
+import com.device42.client.services.Device42ClientFactory;
+import com.device42.client.services.DevicesRestClient;
+import com.device42.client.services.parameters.DeviceParameters;
+import com.dtolabs.rundeck.core.common.INodeSet;
 import com.dtolabs.rundeck.core.plugins.configuration.ConfigurationException;
 import com.dtolabs.rundeck.core.resources.ResourceModelSource;
 import com.dtolabs.rundeck.core.resources.ResourceModelSourceException;
 import org.apache.log4j.Logger;
+import org.identityconnectors.common.security.GuardedString;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -50,8 +57,8 @@ import java.util.concurrent.Future;
  */
 public class EC2ResourceModelSource implements ResourceModelSource {
     static Logger logger = Logger.getLogger(EC2ResourceModelSource.class);
-    private String accessKey;
-    private String secretKey;
+    private String username;
+    private String password;
     long refreshInterval = 30000;
     long lastRefresh = 0;
     String filterParams;
@@ -69,25 +76,25 @@ public class EC2ResourceModelSource implements ResourceModelSource {
     Future<INodeSet> futureResult = null;
     final Properties mapping = new Properties();
 
-    AWSCredentials credentials;
     ClientConfiguration clientConfiguration = new ClientConfiguration();;
     
     INodeSet iNodeSet;
     static final Properties defaultMapping = new Properties();
     DeviceToNodeMapper mapper;
+    public static List<Device> list;
 
     //static {
          String mappingString = "nodename.selector=tags/Name,instanceId\n"
                                + "sshport.default=22\n"
                                + "sshport.selector=tags/ssh_config_Port\n"
-                               + "description.default=EC2 node instance\n"
+                               + "description.default=Device42 Instance Node\n"
                                + "osArch.selector=architecture\n"
                                + "osFamily.selector=platform\n"
                                + "osFamily.default=unix\n"
                                + "osName.selector=platform\n"
                                + "osName.default=Linux\n"
                                + "username.selector=tags/Rundeck-User\n"
-                               + "username.default=ec2-user\n"
+                               + "username.default=rundeck-user\n"
                                + "editUrl.default=https://console.aws.amazon.com/ec2/home#Instances:search=${node.instanceId}\n"
                                + "privateIpAddress.selector=privateIpAddress\n"
                                + "privateDnsName.selector=privateDnsName\n"
@@ -106,8 +113,8 @@ public class EC2ResourceModelSource implements ResourceModelSource {
    // }
 
     public EC2ResourceModelSource(final Properties configuration) {
-        this.accessKey = configuration.getProperty(EC2ResourceModelSourceFactory.ACCESS_KEY);
-        this.secretKey = configuration.getProperty(EC2ResourceModelSourceFactory.SECRET_KEY);
+        this.username = configuration.getProperty(EC2ResourceModelSourceFactory.USERNAME);
+        this.password = configuration.getProperty(EC2ResourceModelSourceFactory.PASSWORD);
         this.endpoint = configuration.getProperty(EC2ResourceModelSourceFactory.ENDPOINT);
         this.httpProxyHost = configuration.getProperty(EC2ResourceModelSourceFactory.HTTP_PROXY_HOST);
         int proxyPort = 80;
@@ -149,9 +156,11 @@ public class EC2ResourceModelSource implements ResourceModelSource {
             runningOnly = Boolean.parseBoolean(configuration.getProperty(
                 EC2ResourceModelSourceFactory.RUNNING_ONLY));
         }
-        if (null != accessKey && null != secretKey) {
-            credentials = new BasicAWSCredentials(accessKey.trim(), secretKey.trim());
-        }
+
+        //TODO:: remove it once everything is finallized - not needed anymore
+        //if (null != username && null != password) {
+        //    credentials = new BasicAWSCredentials(username.trim(), password.trim());
+        //}
         
         if (null != httpProxyHost && !"".equals(httpProxyHost)) {
             clientConfiguration.setProxyHost(httpProxyHost);
@@ -169,12 +178,26 @@ public class EC2ResourceModelSource implements ResourceModelSource {
             Collections.addAll(params, filterParams.split(";"));
         }
         loadMapping();
-        mapper = new DeviceToNodeMapper(mapping);
+        mapper = new DeviceToNodeMapper(mapping, username, password);
         mapper.setFilterParams(params);
         mapper.setEndpoint(endpoint);
         mapper.setRunningStateOnly(runningOnly);
+
+        DevicesRestClient client = Device42ClientFactory.createDeviceClient("https://svnow01.device42.com", username, password);
+        list = client.getDevices(new DeviceParameters.DeviceParametersBuilder().parameter("tags","rundeck").parameter("include_cols","name,ip_addresses,device_id,tags").build());
+        //logger.warn(list.size()+"\n");
+        //logger.warn(list.get(0)+"\n");
+
     }
 
+    public static List<IP> getIP(String device){
+        List<IP> mlist = new ArrayList<IP>();
+        for(Device d : list){
+            if(d.getName().equalsIgnoreCase(device))
+                mlist = d.getIps();
+        }
+        return mlist;
+    }
 
     public synchronized INodeSet getNodes() throws ResourceModelSourceException {
         checkFuture();
@@ -224,7 +247,7 @@ public class EC2ResourceModelSource implements ResourceModelSource {
     private void loadMapping() {
         if (useDefaultMapping) {
             //lets get the server and find the ip for that server
-            logger.warn(EC2ResourceModelSourceFactory.getIP(this.serverName));
+            //logger.warn(EC2ResourceModelSource.getIP(this.serverName));
             try {
                 final InputStream resourceAsStream = EC2ResourceModelSource.class.getClassLoader().getResourceAsStream(
                         "defaultMapping.properties");
@@ -235,7 +258,7 @@ public class EC2ResourceModelSource implements ResourceModelSource {
                         resourceAsStream.close();
                     }
                 }else{
-                    mappingString = mappingString + "hostname.selector="+ EC2ResourceModelSourceFactory.getIP(this.serverName).get(0).getIp() + "\n";
+                    mappingString = mappingString + "hostname.selector="+ EC2ResourceModelSource.getIP(this.serverName).get(0).getIp() + "\n";
                     //fallback in case class loader is misbehaving
                     final StringReader stringReader = new StringReader(mappingString);
                     try {
@@ -277,8 +300,8 @@ public class EC2ResourceModelSource implements ResourceModelSource {
     }
 
     public void validate() throws ConfigurationException {
-        if (null != accessKey && null == secretKey) {
-            throw new ConfigurationException("secretKey is required for use with accessKey");
+        if (null != username && null == password) {
+            throw new ConfigurationException("password is required for use with username");
         }
     }
 }

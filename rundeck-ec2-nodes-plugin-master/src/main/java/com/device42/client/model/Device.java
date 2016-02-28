@@ -2,7 +2,6 @@ package com.device42.client.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Device  implements Serializable {
     private long id;
