@@ -23,17 +23,12 @@
 */
 package com.dtolabs.rundeck.plugin.resources.ec2;
 
-import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.ec2.AmazonEC2AsyncClient;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
-import com.device42.client.model.Device;
-import com.device42.client.model.IP;
-import com.device42.client.services.Device42ClientFactory;
-import com.device42.client.services.DevicesRestClient;
-import com.device42.client.services.parameters.DeviceParameters;
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.common.INodeSet;
 import com.dtolabs.rundeck.core.common.NodeEntryImpl;
@@ -42,7 +37,12 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,7 +61,6 @@ class InstanceToNodeMapper {
     private boolean runningStateOnly = true;
     private Properties mapping;
 
-    /**
     /**
      * Create with the credentials and mapping definition
      */
@@ -88,14 +87,12 @@ class InstanceToNodeMapper {
             ec2.setEndpoint(getEndpoint());
         }
         final ArrayList<Filter> filters = buildFilters();
-        final ArrayList<Device> instances = (ArrayList<Device>) query();
+        final Set<Instance> instances = query(ec2, new DescribeInstancesRequest().withFilters(filters));
 
 
         mapInstances(nodeSet, instances);
         return nodeSet;
     }
-
-
 
     /**
      * Perform the query asynchronously and return the set of instances
@@ -114,12 +111,8 @@ class InstanceToNodeMapper {
         }
         final ArrayList<Filter> filters = buildFilters();
 
-
-
-        final Future<List<Device>> describeInstancesRequest = executorService.submit(new Callable<List<Device>>() {
-            public List<Device> call() throws Exception {
-                return query();
-            }});
+        final Future<DescribeInstancesResult> describeInstancesRequest = ec2.describeInstancesAsync(
+            new DescribeInstancesRequest().withFilters(filters));
 
         return new Future<INodeSet>() {
 
@@ -136,25 +129,34 @@ class InstanceToNodeMapper {
             }
 
             public INodeSet get() throws InterruptedException, ExecutionException {
+                DescribeInstancesResult describeInstancesResult = describeInstancesRequest.get();
+
                 final NodeSetImpl nodeSet = new NodeSetImpl();
-                final ArrayList<Device> instances = (ArrayList<Device>) describeInstancesRequest.get();
+                final Set<Instance> instances = examineResult(describeInstancesResult);
+
                 mapInstances(nodeSet, instances);
                 return nodeSet;
             }
 
             public INodeSet get(final long l, final TimeUnit timeUnit) throws InterruptedException, ExecutionException,
                 TimeoutException {
+                DescribeInstancesResult describeInstancesResult = describeInstancesRequest.get(l, timeUnit);
+
                 final NodeSetImpl nodeSet = new NodeSetImpl();
-                final ArrayList<Device> instances = (ArrayList<Device>) describeInstancesRequest.get();
+                final Set<Instance> instances = examineResult(describeInstancesResult);
+
                 mapInstances(nodeSet, instances);
                 return nodeSet;
             }
         };
     }
 
-    private List<Device> query() {
-        DevicesRestClient client = Device42ClientFactory.createDeviceClient("https://svnow01.device42.com", "admin", "adm!nd42");
-        return client.getDevices(new DeviceParameters.DeviceParametersBuilder().parameter("tags","rundeck").parameter("include_cols","name,ip_addresses,device_id").build());
+    private Set<Instance> query(final AmazonEC2Client ec2, final DescribeInstancesRequest request) {
+        //create "running" filter
+
+        final DescribeInstancesResult describeInstancesRequest = ec2.describeInstances(request);
+
+        return examineResult(describeInstancesRequest);
     }
 
     private Set<Instance> examineResult(DescribeInstancesResult describeInstancesRequest) {
@@ -185,8 +187,8 @@ class InstanceToNodeMapper {
         return filters;
     }
 
-    private void mapInstances(final NodeSetImpl nodeSet, final List<Device> instances) {
-        for (Device inst : instances) {
+    private void mapInstances(final NodeSetImpl nodeSet, final Set<Instance> instances) {
+        for (final Instance inst : instances) {
             final INodeEntry iNodeEntry;
             try {
                 iNodeEntry = InstanceToNodeMapper.instanceToNode(inst, mapping);
@@ -203,13 +205,11 @@ class InstanceToNodeMapper {
      * Convert an AWS EC2 Instance to a RunDeck INodeEntry based on the mapping input
      */
     @SuppressWarnings("unchecked")
-    static INodeEntry instanceToNode(final Device device, final Properties mapping) throws GeneratorException {
+    static INodeEntry instanceToNode(final Instance inst, final Properties mapping) throws GeneratorException {
         final NodeEntryImpl node = new NodeEntryImpl();
 
         //evaluate single settings.selector=tags/* mapping
-        /*
-         *
-         * if ("tags/*".equals(mapping.getProperty("attributes.selector"))) {
+        if ("tags/*".equals(mapping.getProperty("attributes.selector"))) {
             //iterate through instance tags and generate settings
             for (final Tag tag : inst.getTags()) {
                 if (null == node.getAttributes()) {
@@ -218,7 +218,6 @@ class InstanceToNodeMapper {
                 node.getAttributes().put(tag.getKey(), tag.getValue());
             }
         }
-
         if (null != mapping.getProperty("tags.selector")) {
             final String selector = mapping.getProperty("tags.selector");
             final String value = applySelector(inst, selector, mapping.getProperty("tags.default"), true);
@@ -266,7 +265,7 @@ class InstanceToNodeMapper {
             }
         }
         node.setTags(orig);
-*/
+
         //apply default values which do not have corresponding selector
         final Pattern attribDefPat = Pattern.compile("^([^.]+?)\\.default$");
         //evaluate selectors
@@ -285,7 +284,8 @@ class InstanceToNodeMapper {
                 }
             }
         }
-       /* final Pattern attribPat = Pattern.compile("^([^.]+?)\\.selector$");
+
+        final Pattern attribPat = Pattern.compile("^([^.]+?)\\.selector$");
         //evaluate selectors
         for (final Object o : mapping.keySet()) {
             final String key = (String) o;
@@ -307,23 +307,18 @@ class InstanceToNodeMapper {
                 }
             }
         }
-        */
-
-        String hostSel = mapping.getProperty("hostname.selector");
-        List<IP> devices = device.getIps();
-        logger.warn(device.getName());
-        String host = devices.get(0).getIp();
-        node.setHostname(host);
-        if (null == node.getHostname()) {
-            System.err.println("Unable to determine hostname for instance: " + device.getName());
-            return null;
-        }
+//        String hostSel = mapping.getProperty("hostname.selector");
+//        String host = applySelector(inst, hostSel, mapping.getProperty("hostname.default"));
+//        if (null == node.getHostname()) {
+//            System.err.println("Unable to determine hostname for instance: " + inst.getInstanceId());
+//            return null;
+//        }
         String name = node.getNodename();
         if (null == name || "".equals(name)) {
             name = node.getHostname();
         }
         if (null == name || "".equals(name)) {
-            name = device.getName();
+            name = inst.getInstanceId();
         }
         node.setNodename(name);
 
@@ -332,6 +327,7 @@ class InstanceToNodeMapper {
         if (sshport != null && !sshport.equals("") && !sshport.equals("22")) {
             node.setHostname(node.getHostname() + ":" + sshport);
         }
+
         return node;
     }
 
