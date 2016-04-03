@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../d42-java-client-master/d42-java-client.iml" filepath="$PROJECT_DIR$/../d42-java-client-master/d42-java-client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rundeck-ec2-nodes-plugin-master.iml" filepath="$PROJECT_DIR$/rundeck-ec2-nodes-plugin-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rundeck-d42-nodes-plugin-master.iml" filepath="$PROJECT_DIR$/rundeck-d42-nodes-plugin-master.iml" />
     </modules>
   </component>
 </project>

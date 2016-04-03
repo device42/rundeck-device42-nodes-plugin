@@ -246,7 +246,8 @@ public class DeviceToNodeMapper {
         String hostSel = mapping.getProperty("hostname.selector");
         List<IP> devices = device.getIps();
         logger.warn(device.getName());
-        String host = devices.get(0).getIp();
+        node.setNodename(device.getName());
+        /*String host = devices.get(0).getIp();
         node.setHostname(host);
         if (null == node.getHostname()) {
             System.err.println("Unable to determine hostname for instance: " + device.getName());
@@ -260,6 +261,28 @@ public class DeviceToNodeMapper {
             name = device.getName();
         }
         node.setNodename(name);
+**/
+        try {
+            String host = devices.get(0).getIp();
+            node.setHostname(host);
+            if (null == node.getHostname()) {
+                System.err.println("Unable to determine hostname for instance: " + device.getName());
+                return null;
+            }
+            String name = node.getNodename();
+            if (null == name || "".equals(name)) {
+                name = node.getHostname();
+            }
+            if (null == name || "".equals(name)) {
+                name = device.getName();
+            }
+            node.setNodename(name);
+        }catch(IndexOutOfBoundsException ex)
+        {
+            //no ip so lets use the node name instead
+            node.setHostname(device.getName());
+            node.setNodename(device.getName());
+        }
 
         // Set ssh port on hostname if not 22
         String sshport = node.getAttributes().get("sshport");
