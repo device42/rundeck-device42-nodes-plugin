@@ -37,87 +37,89 @@ import java.util.Properties;
 
 @Plugin(name = "d42", service = "ResourceModelSource")
 public class D42ResourceModelSourceFactory implements ResourceModelSourceFactory, Describable {
-    public static final String PROVIDER_NAME = "d42";
+	public static final String PROVIDER_NAME = "d42";
 
-    public static final String ENDPOINT = "endpoint";
-    public static final String FILTER_PARAMS = "filter";
-    public static final String MAPPING_PARAMS = "mappingParams";
-    public static final String RUNNING_ONLY = "runningOnly";
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
-    public static final String MAPPING_FILE = "mappingFile";
-    public static final String REFRESH_INTERVAL = "refreshInterval";
-    public static final String USE_DEFAULT_MAPPING = "useDefaultMapping";
-    public static final String HTTP_PROXY_HOST = "httpProxyHost";
-    public static final String HTTP_PROXY_PORT = "httpProxyPort";
-    public static final String HTTP_PROXY_USER = "httpProxyUser";
-    public static final String HTTP_PROXY_PASS = "httpProxyPass";
-    public static final String SERVER_LIST = "listServer";
-    public static final String SERVER_URL = "serverUrl";
+	public static final String ENDPOINT = "endpoint";
+	public static final String FILTER_PARAMS = "filter";
+	public static final String MAPPING_PARAMS = "mappingParams";
+	public static final String RUNNING_ONLY = "runningOnly";
+	public static final String USERNAME = "username";
+	public static final String PASSWORD = "password";
+	public static final String MAPPING_FILE = "mappingFile";
+	public static final String REFRESH_INTERVAL = "refreshInterval";
+	public static final String USE_DEFAULT_MAPPING = "useDefaultMapping";
+	public static final String HTTP_PROXY_HOST = "httpProxyHost";
+	public static final String HTTP_PROXY_PORT = "httpProxyPort";
+	public static final String HTTP_PROXY_USER = "httpProxyUser";
+	public static final String HTTP_PROXY_PASS = "httpProxyPass";
+	public static final String SERVER_LIST = "listServer";
+	public static final String SERVER_URL = "serverUrl";
 
-    public static List<Device> list;
+	public static List<Device> list;
 
-    public D42ResourceModelSourceFactory() {
-       
-        //DevicesRestClient client = Device42ClientFactory.createDeviceClient("https://svnow01.device42.com", "admin", "adm!nd42");
-        //list = client.getDevices(new DeviceParameters.DeviceParametersBuilder().parameter("tags","rundeck").build());
-    }
+	public D42ResourceModelSourceFactory() {
 
-    public ResourceModelSource createResourceModelSource(final Properties properties) throws ConfigurationException {
-        final D42ResourceModelSource d42ResourceModelSource = new D42ResourceModelSource(properties);
-        d42ResourceModelSource.validate();
-        return d42ResourceModelSource;
-    }
+	}
 
-    /*private static List<String> getDeviceNames(List<Device> deviceList){
-        List<String> list = new ArrayList<String>();
-        for(Device d : deviceList){
-            list.add(d.getName());
-        }
-        return list;
-    }*/
+	public ResourceModelSource createResourceModelSource(final Properties properties) throws ConfigurationException {
+		final D42ResourceModelSource d42ResourceModelSource = new D42ResourceModelSource(properties);
+		d42ResourceModelSource.validate();
+		return d42ResourceModelSource;
+	}
 
-    public Description getDescription() {
-        Description DESC = DescriptionBuilder.builder()
-                .name(PROVIDER_NAME)
-                .title("Rundeck Resources")
-                .description("Devices from d42")
-                .property(PropertyUtil.string(SERVER_URL, "API Url", "", false, null))
-                .property(PropertyUtil.string(USERNAME, "Username", "D42 console username", false, null))
-                .property(
-                        PropertyUtil.string(
-                                PASSWORD,
-                                "Password",
-                                "D42 console password",
-                                false,
-                                null,
-                                null,
-                                null,
-                                Collections.singletonMap("displayType", (Object) StringRenderingConstants.DisplayType.PASSWORD)
-                        )
-                )
-                //.property(PropertyUtil.integer(REFRESH_INTERVAL, "Refresh Interval",
-                //        "Minimum time in seconds between API requests to AWS (default is 30)", false, "30"))
-                .property(PropertyUtil.string(FILTER_PARAMS, "Filter Params", "D42 filter params", false, null))
-                //.property(PropertyUtil.string(MAPPING_PARAMS, "Mapping Params",
-                //        "Property mapping definitions. Specify multiple mappings in the form " +
-                //                "\"attributeName.selector=selector\" or \"attributeName.default=value\", " +
-                //                "separated by \";\"",
-                //        false, null))
-                .property(PropertyUtil.string(MAPPING_FILE, "Mapping File", "Property mapping File", false, null,
-                        new PropertyValidator() {
-                            public boolean isValid(final String s) throws ValidationException {
-                                if (!new File(s).isFile()) {
-                                    throw new ValidationException("File does not exist: " + s);
-                                }
-                                return true;
-                            }
-                        }))
-                .property(PropertyUtil.bool(USE_DEFAULT_MAPPING, "Use Default Mapping",
-                        "Start with default mapping definition. (Defaults will automatically be used if no others are " +
-                                "defined.)",
-                        false, "true"))
-                .build();
-        return DESC;
-    }
+	public Description getDescription() {
+		Description DESC = DescriptionBuilder.builder()
+				.name(PROVIDER_NAME)
+				.title("Rundeck Resources")
+				.description("Devices from d42")
+				.property(PropertyUtil.string(SERVER_URL, "API Url", "", false, null))
+				.property(PropertyUtil.string(USERNAME, "Username", "D42 console username", false, null))
+				.property(
+						PropertyUtil.string(
+								PASSWORD,
+								"Password",
+								"D42 console password",
+								false,
+								null,
+								null,
+								null,
+								Collections.singletonMap("displayType",
+										(Object) StringRenderingConstants.DisplayType.PASSWORD)))
+				.property(PropertyUtil.integer(REFRESH_INTERVAL, "Refresh Interval",
+						"Minimum time in seconds between API requests to Device42 (default is 30)", false, "30",
+						new PropertyValidator() {
+							public boolean isValid(final String value) throws ValidationException {
+								try {
+									if (null == value || value.length() == 0)
+										return true;
+									int num = Integer.parseInt(value);
+									if (num <= 0)
+										throw new ValidationException(D42ResourceModelSourceFactory.REFRESH_INTERVAL
+												+ " value is not valid: " + value);
+								} catch (NumberFormatException e) {
+									throw new ValidationException(D42ResourceModelSourceFactory.REFRESH_INTERVAL
+											+ " value is not valid: " + value);
+								}
+								return true;
+							}
+						}))
+				.property(PropertyUtil.string(FILTER_PARAMS, "Filter Params", "D42 filter params", false, null))
+
+				.property(PropertyUtil.string(MAPPING_FILE, "Mapping File", "Property mapping File", false, null,
+						new PropertyValidator() {
+							public boolean isValid(final String s) throws ValidationException {
+								if (!new File(s).isFile()) {
+									throw new ValidationException("File does not exist: " + s);
+								}
+								return true;
+							}
+						}))
+				.property(PropertyUtil.bool(USE_DEFAULT_MAPPING, "Use Default Mapping",
+						"Start with default mapping definition. (Defaults will automatically be used if no others are "
+								+
+								"defined.)",
+						false, "true"))
+				.build();
+		return DESC;
+	}
 }

@@ -106,18 +106,6 @@ public class DeviceToNodeMapper {
         return client.getDevices(new DeviceParameters.DeviceParametersBuilder().parameterAll(filterParams).parameter("include_cols","name,ip_addresses,device_id,tags").build());
     }
 
-
-    /*private String decryptToString(GuardedString string) {
-        final StringBuilder buf = new StringBuilder();
-        string.access(
-                new GuardedString.Accessor() {
-                    public void access(char [] chars) {
-                        buf.append(chars);
-                    }
-                });
-        return buf.toString();
-    }*/
-
     private void mapInstances(final NodeSetImpl nodeSet, final List<Device> instances) {
         for (Device inst : instances) {
             final INodeEntry iNodeEntry;
@@ -138,70 +126,7 @@ public class DeviceToNodeMapper {
     
     static INodeEntry instanceToNode(final Device device, final Properties mapping) throws GeneratorException {
         final NodeEntryImpl node = new NodeEntryImpl();
-
-        //evaluate single settings.selector=tags/* mapping
-        /*
-         *
-         * if ("tags/*".equals(mapping.getProperty("attributes.selector"))) {
-            //iterate through instance tags and generate settings
-            for (final Tag tag : inst.getTags()) {
-                if (null == node.getAttributes()) {
-                    node.setAttributes(new HashMap<String, String>());
-                }
-                node.getAttributes().put(tag.getKey(), tag.getValue());
-            }
-        }
-
-        if (null != mapping.getProperty("tags.selector")) {
-            final String selector = mapping.getProperty("tags.selector");
-            final String value = applySelector(inst, selector, mapping.getProperty("tags.default"), true);
-            if (null != value) {
-                final String[] values = value.split(",");
-                final HashSet<String> tagset = new HashSet<String>();
-                for (final String s : values) {
-                    tagset.add(s.trim());
-                }
-                if (null == node.getTags()) {
-                    node.setTags(tagset);
-                } else {
-                    final HashSet orig = new HashSet(node.getTags());
-                    orig.addAll(tagset);
-                    node.setTags(orig);
-                }
-            }
-        }
-        if (null == node.getTags()) {
-            node.setTags(new HashSet());
-        }
-        final HashSet orig = new HashSet(node.getTags());
-        //apply specific tag selectors
-        final Pattern tagPat = Pattern.compile("^tag\\.(.+?)\\.selector$");
-        //evaluate tag selectors
-        for (final Object o : mapping.keySet()) {
-            final String key = (String) o;
-            final String selector = mapping.getProperty(key);
-            //split selector by = if present
-            final String[] selparts = selector.split("=");
-            final Matcher m = tagPat.matcher(key);
-            if (m.matches()) {
-                final String tagName = m.group(1);
-                if (null == node.getAttributes()) {
-                    node.setAttributes(new HashMap<String, String>());
-                }
-                final String value = applySelector(inst, selparts[0], null);
-                if (null != value) {
-                    if (selparts.length > 1 && !value.equals(selparts[1])) {
-                        continue;
-                    }
-                    //use add the tag if the value is not null
-                    orig.add(tagName);
-                }
-            }
-        }
-        node.setTags(orig);
-*/
-        //apply default values which do not have corresponding selector
-        final Pattern attribDefPat = Pattern.compile("^([^.]+?)\\.default$");
+      final Pattern attribDefPat = Pattern.compile("^([^.]+?)\\.default$");
         //evaluate selectors
         for (final Object o : mapping.keySet()) {
             final String key = (String) o;
@@ -218,49 +143,10 @@ public class DeviceToNodeMapper {
                 }
             }
         }
-       /* final Pattern attribPat = Pattern.compile("^([^.]+?)\\.selector$");
-        //evaluate selectors
-        for (final Object o : mapping.keySet()) {
-            final String key = (String) o;
-            final String selector = mapping.getProperty(key);
-            final Matcher m = attribPat.matcher(key);
-            if (m.matches()) {
-                final String attrName = m.group(1);
-                if(attrName.equals("tags")){
-                    //already handled
-                    continue;
-                }
-                if (null == node.getAttributes()) {
-                    node.setAttributes(new HashMap<String, String>());
-                }
-                final String value = applySelector(inst, selector, mapping.getProperty(attrName + ".default"));
-                if (null != value) {
-                    //use nodename-settingname to make the setting unique to the node
-                    node.getAttributes().put(attrName, value);
-                }
-            }
-        }
-        */
-
-        //String hostSel = mapping.getProperty("hostname.selector");
         List<IP> devices = device.getIps();
         logger.warn(device.getName());
         node.setNodename(device.getName());
-        /*String host = devices.get(0).getIp();
-        node.setHostname(host);
-        if (null == node.getHostname()) {
-            System.err.println("Unable to determine hostname for instance: " + device.getName());
-            return null;
-        }
-        String name = node.getNodename();
-        if (null == name || "".equals(name)) {
-            name = node.getHostname();
-        }
-        if (null == name || "".equals(name)) {
-            name = device.getName();
-        }
-        node.setNodename(name);
-**/
+        
         try {
             String host = devices.get(0).getIp();
             node.setHostname(host);
@@ -276,8 +162,7 @@ public class DeviceToNodeMapper {
                 name = device.getName();
             }
             node.setNodename(name);
-        }catch(IndexOutOfBoundsException ex)
-        {
+        } catch(IndexOutOfBoundsException ex) {
             //no ip so lets use the node name instead
             node.setHostname(device.getName());
             node.setNodename(device.getName());
@@ -291,78 +176,7 @@ public class DeviceToNodeMapper {
         return node;
     }
 
-    /**
-     * Return the result of the selector applied to the instance, otherwise return the defaultValue. The selector can be
-     * a comma-separated list of selectors
-     */
- /*   public static String applySelector(final Instance inst, final String selector, final String defaultValue) throws
-            GeneratorException {
-        return applySelector(inst, selector, defaultValue, false);
-    }
-*/
-    /**
-     * Return the result of the selector applied to the instance, otherwise return the defaultValue. The selector can be
-     * a comma-separated list of selectors.
-     * @param inst the instance
-     * @param selector the selector string
-     * @param defaultValue a default value to return if there is no result from the selector
-     * @param tagMerge if true, allow | separator to merge multiple values
-     */
- /*   public static String applySelector(final Instance inst, final String selector, final String defaultValue,
-                                       final boolean tagMerge) throws
-            GeneratorException {
-
-        if (null != selector) {
-            for (final String selPart : selector.split(",")) {
-                if (tagMerge) {
-                    final StringBuilder sb = new StringBuilder();
-                    for (final String subPart : selPart.split(Pattern.quote("|"))) {
-                        final String val = applySingleSelector(inst, subPart);
-                        if (null != val) {
-                            if (sb.length() > 0) {
-                                sb.append(",");
-                            }
-                            sb.append(val);
-                        }
-                    }
-                    if (sb.length() > 0) {
-                        return sb.toString();
-                    }
-                } else {
-                    final String val = applySingleSelector(inst, selPart);
-                    if (null != val) {
-                        return val;
-                    }
-                }
-            }
-        }
-        return defaultValue;
-    }
-
-    private static String applySingleSelector(final Instance inst, final String selector) throws
-            GeneratorException {
-        if (null != selector && !"".equals(selector) && selector.startsWith("tags/")) {
-            final String tag = selector.substring("tags/".length());
-            final List<Tag> tags = inst.getTags();
-            for (final Tag tag1 : tags) {
-                if (tag.equals(tag1.getKey())) {
-                    return tag1.getValue();
-                }
-            }
-        } else if (null != selector && !"".equals(selector)) {
-            try {
-                final String value = BeanUtils.getProperty(inst, selector);
-                if (null != value) {
-                    return value;
-                }
-            } catch (Exception e) {
-                throw new GeneratorException(e);
-            }
-        }
-
-        return null;
-    }
-*/
+ 
     /**
      * Return the list of "filter=value" filters
      */

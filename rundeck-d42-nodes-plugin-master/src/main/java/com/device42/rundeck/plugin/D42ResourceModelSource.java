@@ -95,21 +95,6 @@ public class D42ResourceModelSource implements ResourceModelSource {
         this.username = configuration.getProperty(D42ResourceModelSourceFactory.USERNAME);
         this.password = configuration.getProperty(D42ResourceModelSourceFactory.PASSWORD);
         this.endpoint = configuration.getProperty(D42ResourceModelSourceFactory.ENDPOINT);
-        this.httpProxyHost = configuration.getProperty(D42ResourceModelSourceFactory.HTTP_PROXY_HOST);
-        int proxyPort = 80;
-        
-        final String proxyPortStr = configuration.getProperty(D42ResourceModelSourceFactory.HTTP_PROXY_PORT);
-        if (null != proxyPortStr && !"".equals(proxyPortStr)) {
-            try {
-                proxyPort = Integer.parseInt(proxyPortStr);
-            } catch (NumberFormatException e) {
-                logger.warn(D42ResourceModelSourceFactory.HTTP_PROXY_PORT + " value is not valid: " + proxyPortStr);
-            }
-        }
-        this.httpProxyPort = proxyPort;
-        this.httpProxyUser = configuration.getProperty(D42ResourceModelSourceFactory.HTTP_PROXY_USER);
-        this.httpProxyPass = configuration.getProperty(D42ResourceModelSourceFactory.HTTP_PROXY_PASS);
-        this.serverName = configuration.getProperty(D42ResourceModelSourceFactory.SERVER_LIST);
         this.apiUrl = configuration.getProperty(D42ResourceModelSourceFactory.SERVER_URL);
 
         this.filterParams = configuration.getProperty(D42ResourceModelSourceFactory.FILTER_PARAMS);
