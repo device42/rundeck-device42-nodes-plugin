@@ -2,7 +2,6 @@ package com.device42.client.services;
 
 import com.device42.client.parser.BasicErrorJsonParser;
 import com.device42.client.parser.JsonObjectParser;
-import com.device42.client.parser.JsonParser;
 import com.device42.client.services.parameters.EmptyInputParameters;
 import com.device42.client.services.parameters.InputParameters;
 import com.device42.client.util.Device42ClientException;
@@ -50,12 +49,12 @@ abstract class AbstractAsynchronousRestClient implements Closeable {
         return clientContext;
     }
 
-    protected <T> T get(String path, JsonParser<?, T> parser) {
+    protected <T> T get(String path, JsonObjectParser<T> parser) {
         return get(path, parser, new EmptyInputParameters());
     }
 
-    @SuppressWarnings("unchecked")
-    protected <T> T get(String path, JsonParser<?, T> parser, InputParameters inputParameters) {
+    
+    protected <T> T get(String path, JsonObjectParser<T> parser, InputParameters inputParameters) {
         RequestBuilder requestBuilder = RequestBuilder.get().setUri(path);
         for (Map.Entry<String, String> entry : inputParameters.parametersMap().entrySet()) {
             requestBuilder.addParameter(entry.getKey(), entry.getValue());

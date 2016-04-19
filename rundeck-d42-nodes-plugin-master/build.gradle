@@ -88,7 +88,7 @@ jar {
         attributes 'Rundeck-Plugin-Version': rundeckPluginVersion, 'Rundeck-Plugin-Archive': 'true', 'Rundeck-Plugin-Libs-Load-First':'false'
         //create space-separated list of pluginLibs
         def libList = configurations.pluginLibs.collect{'lib/'+it.name}.join(' ')
-        attributes 'Rundeck-Plugin-Classnames': 'com.dtolabs.rundeck.plugin.resources.d42.D42ResourceModelSourceFactory', 'Rundeck-Plugin-Libs': "${libList}"
+        attributes 'Rundeck-Plugin-Classnames': 'com.device42.rundeck.plugin.D42ResourceModelSourceFactory', 'Rundeck-Plugin-Libs': "${libList}"
     }
 }
 

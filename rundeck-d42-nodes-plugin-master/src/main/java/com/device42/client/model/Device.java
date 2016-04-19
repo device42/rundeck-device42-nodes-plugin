@@ -4,7 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Device  implements Serializable {
-    private long id;
+    /**
+	 * generated
+	 */
+	private static final long serialVersionUID = -2681026808687047734L;
+	private long id;
     private String name;
     private String hardwareModel;
     private String serialNo;

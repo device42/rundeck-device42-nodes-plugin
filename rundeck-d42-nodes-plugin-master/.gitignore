@@ -3,3 +3,6 @@
 *.iml
 *.iws
 build/
+/bin/
+
+/target/
