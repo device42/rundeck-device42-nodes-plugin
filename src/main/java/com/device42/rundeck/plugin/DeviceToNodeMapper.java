@@ -130,7 +130,7 @@ public class DeviceToNodeMapper {
 
 		List<IP> ips = device.getIps();
 		
-		if (ips != null && ips.size() > 0) {
+		/*if (ips != null && ips.size() > 0) {
 			for (IP ip : ips) {
 				String host = ip.getIp();
 				if (StringUtils.isNotBlank(host)) {
@@ -144,11 +144,11 @@ public class DeviceToNodeMapper {
 				}
 			}
 
-		} else {
+		} else {*/
 			// no ip so lets use the node name instead
 			node.setHostname(device.getName());
 			node.setNodename(device.getName());
-		}
+		//}
 		
 		node.setOsName(device.getOs());
 		node.setOsVersion(device.getOsVer());
