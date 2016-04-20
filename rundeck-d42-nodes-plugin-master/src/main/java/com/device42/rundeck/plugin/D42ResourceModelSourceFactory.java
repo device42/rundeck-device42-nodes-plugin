@@ -30,30 +30,29 @@ import com.dtolabs.rundeck.core.resources.ResourceModelSource;
 import com.dtolabs.rundeck.core.resources.ResourceModelSourceFactory;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 
-import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 @Plugin(name = "d42", service = "ResourceModelSource")
 public class D42ResourceModelSourceFactory implements ResourceModelSourceFactory, Describable {
 	public static final String PROVIDER_NAME = "d42";
 
-	public static final String ENDPOINT = "endpoint";
-	public static final String FILTER_PARAMS = "filter";
-	public static final String MAPPING_PARAMS = "mappingParams";
-	public static final String RUNNING_ONLY = "runningOnly";
+	public static final String SERVER_URL = "serverUrl";
 	public static final String USERNAME = "username";
 	public static final String PASSWORD = "password";
-	public static final String MAPPING_FILE = "mappingFile";
+	public static final String FILTER_PARAMS = "filter";
 	public static final String REFRESH_INTERVAL = "refreshInterval";
-	public static final String USE_DEFAULT_MAPPING = "useDefaultMapping";
-	public static final String HTTP_PROXY_HOST = "httpProxyHost";
-	public static final String HTTP_PROXY_PORT = "httpProxyPort";
-	public static final String HTTP_PROXY_USER = "httpProxyUser";
-	public static final String HTTP_PROXY_PASS = "httpProxyPass";
-	public static final String SERVER_LIST = "listServer";
-	public static final String SERVER_URL = "serverUrl";
+
+	public static final int GROUPS_AMOUNT = 5;
+
+	public static final String FILTER_KEY_PREFIX = "filterKey";
+	public static final String FILTER_VALUE_PREFIX = "filterValue";
+	public static final String FILTER_GROUP_PREFIX = "Filter ";
+	public static final String[] FILTER_KEYS = { "tags", "os", "service_level", "customer" };
 
 	public static List<Device> list;
 
@@ -67,8 +66,26 @@ public class D42ResourceModelSourceFactory implements ResourceModelSourceFactory
 		return d42ResourceModelSource;
 	}
 
+	private Map<String, Object> getGroupRenderingOptions(String groupName) {
+		Map<String, Object> renderingOptions = new HashMap<String, Object>();
+		renderingOptions.put("groupName", groupName);
+		renderingOptions.put("grouping", "secondary");
+		return renderingOptions;
+	}
+
+	private void addFilterGroup(DescriptionBuilder descBuilder, int index) {
+		String groupName = FILTER_GROUP_PREFIX + index;
+		Map<String, Object> renderingOptions = getGroupRenderingOptions(groupName);
+		descBuilder.property(PropertyUtil.freeSelect(FILTER_KEY_PREFIX + index,
+				"Filter Key", "Please select the key for the filtering from a list or enter your key id", false, null,
+				Arrays.asList(FILTER_KEYS), null, null, renderingOptions));
+		descBuilder.property(PropertyUtil.string(FILTER_VALUE_PREFIX + index, "Filter Value",
+				"Please enter the value you want to filter for", false, null, null, null, renderingOptions));
+
+	}
+
 	public Description getDescription() {
-		Description DESC = DescriptionBuilder.builder()
+		DescriptionBuilder descBuilder = DescriptionBuilder.builder()
 				.name(PROVIDER_NAME)
 				.title("Rundeck Resources")
 				.description("Devices from d42")
@@ -102,24 +119,13 @@ public class D42ResourceModelSourceFactory implements ResourceModelSourceFactory
 								}
 								return true;
 							}
-						}))
-				.property(PropertyUtil.string(FILTER_PARAMS, "Filter Params", "D42 filter params", false, null))
+						}));
+		for (int i = 1; i <= GROUPS_AMOUNT; i++) {
+			addFilterGroup(descBuilder, i);
+		}
+		descBuilder.property(PropertyUtil.string(FILTER_PARAMS, "Filter Params", "D42 filter params", false, null, null,
+				null, getGroupRenderingOptions("Filter String")));
 
-				.property(PropertyUtil.string(MAPPING_FILE, "Mapping File", "Property mapping File", false, null,
-						new PropertyValidator() {
-							public boolean isValid(final String s) throws ValidationException {
-								if (!new File(s).isFile()) {
-									throw new ValidationException("File does not exist: " + s);
-								}
-								return true;
-							}
-						}))
-				.property(PropertyUtil.bool(USE_DEFAULT_MAPPING, "Use Default Mapping",
-						"Start with default mapping definition. (Defaults will automatically be used if no others are "
-								+
-								"defined.)",
-						false, "true"))
-				.build();
-		return DESC;
+		return descBuilder.build();
 	}
 }

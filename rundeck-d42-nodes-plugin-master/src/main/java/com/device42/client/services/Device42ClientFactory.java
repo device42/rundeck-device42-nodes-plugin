@@ -18,6 +18,8 @@ import org.apache.log4j.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+
+import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -27,7 +29,7 @@ import java.util.List;
 public class Device42ClientFactory {
 	private static Logger logger = Logger.getLogger(Device42ClientFactory.class);
 
-	public static DevicesRestClient createDeviceClient(String baseUrl, String username, String password) {
+	public static DevicesRestClient createDeviceClient(String baseUrl, String username, String password) throws URISyntaxException {
 		return new DevicesRestClient(baseUrl, createHttpClient(username, password));
 	}
 

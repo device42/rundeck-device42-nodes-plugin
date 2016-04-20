@@ -1,8 +1,10 @@
 package com.device42.client.services;
 
 import com.device42.client.parser.BasicErrorJsonParser;
+import com.device42.client.parser.JsonObjectListParser;
 import com.device42.client.parser.JsonObjectParser;
 import com.device42.client.services.parameters.EmptyInputParameters;
+import com.device42.client.services.parameters.InputLimitParameters;
 import com.device42.client.services.parameters.InputParameters;
 import com.device42.client.util.Device42ClientException;
 import org.apache.http.HttpHost;
@@ -21,6 +23,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 abstract class AbstractAsynchronousRestClient implements Closeable {
@@ -84,4 +87,21 @@ abstract class AbstractAsynchronousRestClient implements Closeable {
             throw new Device42ClientException(ex.getMessage());
         }
     }
+    
+    protected <T> List<T> getAll(String path, JsonObjectListParser<T> parser) {
+		return getAll(path, parser, new EmptyInputParameters());
+	}
+
+	protected <T> List<T> getAll(String path, JsonObjectListParser<T> parser, InputLimitParameters inputParameters) {
+		List<T> result = get(path, parser, inputParameters);
+		if (result != null && parser.getLimit() > 0 && parser.getCount() > 0 && parser.getCount() > result.size()) {
+			for (int offset = parser.getLimit(); offset < parser.getCount(); offset += parser.getLimit()) {
+				inputParameters.addLimit(parser.getLimit());
+				inputParameters.addOffset(offset);
+				List<T> partialResult = get(path, parser, inputParameters);
+				result.addAll(partialResult);
+			}
+		}
+		return result;
+	}
 }
