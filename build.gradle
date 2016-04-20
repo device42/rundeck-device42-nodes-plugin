@@ -11,6 +11,7 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'eclipse'
 apply plugin: 'pl.allegro.tech.build.axion-release'
 sourceCompatibility = 1.6
 defaultTasks 'clean', 'build'
