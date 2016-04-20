@@ -36,19 +36,59 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+/**
+ * This class allows to generate the INodeSet of the noted linked to the Device42 instance
+ * according to filter criteria
+ * @author yunusdawji
+ *
+ */
 public class D42ResourceModelSource implements ResourceModelSource {
+	/**
+	 * Logger to log the error information to the console log of Rundesk application
+	 */
     static Logger logger = Logger.getLogger(D42ResourceModelSource.class);
+    /**
+     * The url of the Device42 server
+     */
     String apiUrl;
+    /**
+     * The username that will be used to authenticate at Device42 server
+     */
     private String username;
+    /**
+     * The password that will be used to authenticate at Device42 server
+     */
     private String password;
-    String filterParams;
+    
+    /**
+     * The lifetime of the cache. If the time after the last scan exceeds this period
+     * the rescan is being ordered. In milliseconds.
+     */
     long refreshInterval = 30000;
+    /**
+     * The last time when the devices were collected. The linux time representation.
+     */
     long lastRefresh = 0;
     
-    boolean queryAsync = true;
+    
+    /**
+     * The variable to keep the nodeset on the asynchronous scan
+     */
     Future<INodeSet> futureResult = null;
+    /**
+     * The actual noteset that will be returned on request
+     */
     INodeSet iNodeSet;
+    /**
+     * The mapper between Device42 Devices and NodeSet implementations
+     */
     DeviceToNodeMapper mapper;
+    
+    /**
+     * Constructs the objects according to the properties. 
+     * @param configuration The properties for configuration. Should contain server URL, username and password as 
+     * the requred parameters. Optionally can contain the cache refresh interval and filtering parameters
+     */
     public D42ResourceModelSource(final Properties configuration) {
         this.username = configuration.getProperty(D42ResourceModelSourceFactory.USERNAME);
         this.password = configuration.getProperty(D42ResourceModelSourceFactory.PASSWORD);
@@ -57,6 +97,7 @@ public class D42ResourceModelSource implements ResourceModelSource {
 
         int refreshSecs = 30;
         final String refreshStr = configuration.getProperty(D42ResourceModelSourceFactory.REFRESH_INTERVAL);
+        //Apply the refresh interval if exists. If not - we are getting default value of 30 seconds
         if (null != refreshStr && !"".equals(refreshStr)) {
             try {
                 refreshSecs = Integer.parseInt(refreshStr);
@@ -66,20 +107,27 @@ public class D42ResourceModelSource implements ResourceModelSource {
         }
         refreshInterval = refreshSecs * 1000;
         
-        
         initialize(configuration);
     }
 
+    /**
+     * Scan the parameters for the filter entries.
+     * @param configuration The properties that contain the filter entries. @see D42ResourceModelSourceFactory for details
+     */
     private void initialize(final Properties configuration) {
-    	this.filterParams = configuration.getProperty(D42ResourceModelSourceFactory.FILTER_PARAMS);
+    	String filterParams = configuration.getProperty(D42ResourceModelSourceFactory.FILTER_PARAMS);
         final HashMap<String, String> params = new HashMap<String, String>();
+        //Scan for human readable key value parameters combined in groups
         for (int i = 1; i <= D42ResourceModelSourceFactory.GROUPS_AMOUNT; i++) {
         	String filterKey = configuration.getProperty(D42ResourceModelSourceFactory.FILTER_KEY_PREFIX + i);
         	String filterValue = configuration.getProperty(D42ResourceModelSourceFactory.FILTER_VALUE_PREFIX + i);
         	if (StringUtils.isNotBlank(filterKey) && StringUtils.isNotBlank(filterValue)) {
         		params.put(filterKey.trim(), filterValue.trim());
+        		
         	}
         }
+        
+        //Scan for default filter entry in the form of key=value&key=value
         if (null != filterParams && filterParams.length() > 0) {
             String[] list = filterParams.split("&");
             for (String s : list){
@@ -93,23 +141,24 @@ public class D42ResourceModelSource implements ResourceModelSource {
     }
 
     public synchronized INodeSet getNodes() throws ResourceModelSourceException {
+    	//collect the data if the async operation was completed
         checkFuture();
         if (!needsRefresh()) {
             if (null != iNodeSet) {
-                logger.info("Returning " + iNodeSet.getNodeNames().size() + " cached nodes from EC2");
+                logger.info("Returning " + iNodeSet.getNodeNames().size() + " cached nodes from Device42");
             }
             return iNodeSet;
         }
-        if (lastRefresh > 0 && queryAsync && null == futureResult) {
+        if (lastRefresh > 0 && null == futureResult) {
             futureResult = mapper.performQueryAsync();
             lastRefresh = System.currentTimeMillis();
-        } else if (!queryAsync || lastRefresh < 1) {
+        } else if (lastRefresh < 1) {
             //always perform synchronous query the first time
             iNodeSet = mapper.performQuery();
             lastRefresh = System.currentTimeMillis();
         }
         if (null != iNodeSet) {
-            logger.info("Read " + iNodeSet.getNodeNames().size() + " nodes from EC2");
+            logger.info("Read " + iNodeSet.getNodeNames().size() + " nodes from Device42");
         }
         return iNodeSet;
     }
@@ -122,7 +171,7 @@ public class D42ResourceModelSource implements ResourceModelSource {
             try {
                 iNodeSet = futureResult.get();
             } catch (InterruptedException e) {
-                logger.debug(e);
+                logger.debug("Interrupted", e);
             } catch (ExecutionException e) {
                 logger.warn("Error performing query: " + e.getMessage(), e);
             }
@@ -139,9 +188,13 @@ public class D42ResourceModelSource implements ResourceModelSource {
 
    
 
+    /**
+     * Check if the Resource Model object contains necessary parameters
+     * @throws ConfigurationException when the server url, username or password were not provided
+     */
     public void validate() throws ConfigurationException {
         if (null == username || null == password || null == apiUrl) {
-            throw new ConfigurationException("You should set up server credentials");
+            throw new ConfigurationException("You should set up server url and credentials");
         }
     }
 }
