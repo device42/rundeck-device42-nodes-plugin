@@ -3,12 +3,10 @@ package com.device42.client.model;
 import java.util.List;
 
 /**
- * Representation of Device entity inside the Device42 Application
- * @author Alexey
- *
+ * Representation of Device entity that is coming from the Device42 Application
  */
 public class Device {
-	
+
 	/**
 	 * The id of the device
 	 */
@@ -88,6 +86,7 @@ public class Device {
 
 	/**
 	 * Get the asset number of the device
+	 * 
 	 * @return The asset number of the device
 	 */
 	public String getAssetNo() {
@@ -96,6 +95,7 @@ public class Device {
 
 	/**
 	 * Get the hardware model of the device
+	 * 
 	 * @return The hardware model of the device
 	 */
 	public String getHardwareModel() {
@@ -104,6 +104,7 @@ public class Device {
 
 	/**
 	 * Get the id of the device
+	 * 
 	 * @return The id of the device
 	 */
 	public long getId() {
@@ -112,6 +113,7 @@ public class Device {
 
 	/**
 	 * Get the manufacturer of the device
+	 * 
 	 * @return The manufacturer of the device
 	 */
 	public String getManufacturer() {
@@ -120,6 +122,7 @@ public class Device {
 
 	/**
 	 * Get the name of the device
+	 * 
 	 * @return The name of the device
 	 */
 	public String getName() {
@@ -128,6 +131,7 @@ public class Device {
 
 	/**
 	 * Get the rack the device belongs to
+	 * 
 	 * @return The rack the device belongs to
 	 */
 	public String getRack() {
@@ -136,6 +140,7 @@ public class Device {
 
 	/**
 	 * Get the serial number of the device
+	 * 
 	 * @return The serial number of the device
 	 */
 	public String getSerialNo() {
@@ -144,6 +149,7 @@ public class Device {
 
 	/**
 	 * Get the service level of the device
+	 * 
 	 * @return The service level of the device
 	 */
 	public String getServiceLevel() {
@@ -152,6 +158,7 @@ public class Device {
 
 	/**
 	 * Get the type of the device
+	 * 
 	 * @return The type of the device
 	 */
 	public String getType() {
@@ -160,6 +167,7 @@ public class Device {
 
 	/**
 	 * Get the UUID of the device
+	 * 
 	 * @return The UUID of the device
 	 */
 	public String getUuid() {
@@ -168,6 +176,7 @@ public class Device {
 
 	/**
 	 * Get the name of virtual host if the device is virtual
+	 * 
 	 * @return The name of virtual host if the device is virtual
 	 */
 	public String getVirtualHostName() {
@@ -176,7 +185,9 @@ public class Device {
 
 	/**
 	 * Set the asset number of the device
-	 * @param assetNo The asset number of the device
+	 * 
+	 * @param assetNo
+	 *            The asset number of the device
 	 */
 	public void setAssetNo(String assetNo) {
 		this.assetNo = assetNo;
@@ -184,7 +195,9 @@ public class Device {
 
 	/**
 	 * Set the hardware model of the device
-	 * @param hardwareModel The hardware model of the device
+	 * 
+	 * @param hardwareModel
+	 *            The hardware model of the device
 	 */
 	public void setHardwareModel(String hardwareModel) {
 		this.hardwareModel = hardwareModel;
@@ -192,7 +205,9 @@ public class Device {
 
 	/**
 	 * Set the id of the device
-	 * @param id The id of the device
+	 * 
+	 * @param id
+	 *            The id of the device
 	 */
 	public void setId(long id) {
 		this.id = id;
@@ -200,7 +215,9 @@ public class Device {
 
 	/**
 	 * Set the manufacturer of the device
-	 * @param manufacturer The manufacturer of the device
+	 * 
+	 * @param manufacturer
+	 *            The manufacturer of the device
 	 */
 	public void setManufacturer(String manufacturer) {
 		this.manufacturer = manufacturer;
@@ -208,7 +225,9 @@ public class Device {
 
 	/**
 	 * Set the name of the device
-	 * @param name The name of the device
+	 * 
+	 * @param name
+	 *            The name of the device
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -216,7 +235,9 @@ public class Device {
 
 	/**
 	 * Set the rack the device belongs to
-	 * @param rack The rack the device belongs to
+	 * 
+	 * @param rack
+	 *            The rack the device belongs to
 	 */
 	public void setRack(String rack) {
 		this.rack = rack;
@@ -224,7 +245,9 @@ public class Device {
 
 	/**
 	 * Set the serial number of the device
-	 * @param serialNo The serial number of the device
+	 * 
+	 * @param serialNo
+	 *            The serial number of the device
 	 */
 	public void setSerialNo(String serialNo) {
 		this.serialNo = serialNo;
@@ -232,7 +255,9 @@ public class Device {
 
 	/**
 	 * Set the service level of the device
-	 * @param serviceLevel The service level of the device
+	 * 
+	 * @param serviceLevel
+	 *            The service level of the device
 	 */
 	public void setServiceLevel(String serviceLevel) {
 		this.serviceLevel = serviceLevel;
@@ -240,7 +265,9 @@ public class Device {
 
 	/**
 	 * Set the type of the device
-	 * @param type The type of the device
+	 * 
+	 * @param type
+	 *            The type of the device
 	 */
 	public void setType(String type) {
 		this.type = type;
@@ -248,7 +275,9 @@ public class Device {
 
 	/**
 	 * Set the UUID of the device
-	 * @param uuid The UUID of the device
+	 * 
+	 * @param uuid
+	 *            The UUID of the device
 	 */
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
@@ -256,7 +285,9 @@ public class Device {
 
 	/**
 	 * Set the name of virtual host if the device is virtual
-	 * @param virtualHostName The name of virtual host if the device is virtual
+	 * 
+	 * @param virtualHostName
+	 *            The name of virtual host if the device is virtual
 	 */
 	public void setVirtualHostName(String virtualHostName) {
 		this.virtualHostName = virtualHostName;
@@ -272,6 +303,7 @@ public class Device {
 
 	/**
 	 * Get the tags of the device
+	 * 
 	 * @return The tags of the device
 	 */
 	public String[] getTags() {
@@ -280,7 +312,9 @@ public class Device {
 
 	/**
 	 * Set the tags of the device
-	 * @param tags The tags of the device
+	 * 
+	 * @param tags
+	 *            The tags of the device
 	 */
 	public void setTags(String[] tags) {
 		this.tags = tags;
@@ -288,6 +322,7 @@ public class Device {
 
 	/**
 	 * Get the customer entry of the device
+	 * 
 	 * @return The customer entry of the device
 	 */
 	public String getCustomer() {
@@ -296,7 +331,9 @@ public class Device {
 
 	/**
 	 * Set the customer entry of the device
-	 * @param customer The customer entry of the device
+	 * 
+	 * @param customer
+	 *            The customer entry of the device
 	 */
 	public void setCustomer(String customer) {
 		this.customer = customer;
@@ -304,6 +341,7 @@ public class Device {
 
 	/**
 	 * Get the room the device belongs to
+	 * 
 	 * @return The room the device belongs to
 	 */
 	public String getRoom() {
@@ -312,7 +350,9 @@ public class Device {
 
 	/**
 	 * Set the room the device belongs to
-	 * @param room The room the device belongs to
+	 * 
+	 * @param room
+	 *            The room the device belongs to
 	 */
 	public void setRoom(String room) {
 		this.room = room;
@@ -320,6 +360,7 @@ public class Device {
 
 	/**
 	 * Get the operative system name of the device
+	 * 
 	 * @return The operative system name of the device
 	 */
 	public String getBuilding() {
@@ -328,7 +369,9 @@ public class Device {
 
 	/**
 	 * Set the operative system name of the device
-	 * @param building The operative system name of the device
+	 * 
+	 * @param building
+	 *            The operative system name of the device
 	 */
 	public void setBuilding(String building) {
 		this.building = building;
@@ -336,6 +379,7 @@ public class Device {
 
 	/**
 	 * Is the device in service or not
+	 * 
 	 * @return Is the device in service or not
 	 */
 	public boolean isInService() {
@@ -344,30 +388,36 @@ public class Device {
 
 	/**
 	 * Set is the device in service or not
-	 * @param inService Is the device in service or not
+	 * 
+	 * @param inService
+	 *            Is the device in service or not
 	 */
 	public void setInService(boolean inService) {
 		this.inService = inService;
 	}
-	
+
 	/**
 	 * Get IPs list of the device
+	 * 
 	 * @return IPs list of the device
 	 */
 	public List<IP> getIps() {
-        return ips;
-    }
+		return ips;
+	}
 
-    /**
-     * Set IPs list of the device
-     * @param ips IPs list of the device
-     */
-    public void setIps(List<IP> ips) {
-        this.ips = ips;
-    }
+	/**
+	 * Set IPs list of the device
+	 * 
+	 * @param ips
+	 *            IPs list of the device
+	 */
+	public void setIps(List<IP> ips) {
+		this.ips = ips;
+	}
 
 	/**
 	 * Get the operative system name of the device
+	 * 
 	 * @return The operative system name of the device
 	 */
 	public String getOs() {
@@ -376,7 +426,9 @@ public class Device {
 
 	/**
 	 * Set the operative system name of the device
-	 * @param os The operative system name of the device
+	 * 
+	 * @param os
+	 *            The operative system name of the device
 	 */
 	public void setOs(String os) {
 		this.os = os;
@@ -384,6 +436,7 @@ public class Device {
 
 	/**
 	 * Get the operative system version of the device
+	 * 
 	 * @return The operative system version of the device
 	 */
 	public String getOsVer() {
@@ -392,7 +445,9 @@ public class Device {
 
 	/**
 	 * Set the operative system version of the device
-	 * @param osVer The operative system version of the device
+	 * 
+	 * @param osVer
+	 *            The operative system version of the device
 	 */
 	public void setOsVer(String osVer) {
 		this.osVer = osVer;

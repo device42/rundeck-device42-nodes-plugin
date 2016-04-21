@@ -10,8 +10,19 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
 
+/**
+ * Convert the incoming JSON Object into @see com.device42.client.model.Device
+ */
 public class BasicDeviceJsonParser implements JsonObjectParser<Device> {
 
+	/**
+	 * Helper parser to extract the ip address info from the devices
+	 */
+	BasicIPJsonParser ipJsonParser = new BasicIPJsonParser();
+
+	/**
+	 * Extract Device information from the JSON Object
+	 */
 	@Override
 	public Device parse(JSONObject json) throws JSONException {
 
@@ -34,26 +45,28 @@ public class BasicDeviceJsonParser implements JsonObjectParser<Device> {
 		device.setOsVer(JsonUtil.extractString(json, "osver"));
 		// Consider default as true
 		device.setInService(!"false".equals(JsonUtil.extractString(json, "in_service")));
+		// Extract ip addresses
 		if (json.has("ip_addresses")) {
 
 			ArrayList<IP> listdata = new ArrayList<IP>();
 			JSONArray jArray = json.getJSONArray("ip_addresses");
 			if (jArray != null) {
 				for (int i = 0; i < jArray.length(); i++) {
-					listdata.add(new BasicIPJsonParser().parse(jArray.getJSONObject(i)));
+					listdata.add(ipJsonParser.parse(jArray.getJSONObject(i)));
 				}
 			}
 			device.setIps(listdata);
 		}
+		// Extract tags
 		if (json.has("tags")) {
 
 			JSONArray tagsArray = json.getJSONArray("tags");
-			ArrayList<String>tagsList = new ArrayList<String>();
+			ArrayList<String> tagsList = new ArrayList<String>();
 			if (tagsArray != null)
-				
-			for (int i = 0; i < tagsArray.length(); i++) {
-				tagsList.add(tagsArray.getString(i));
-			}
+
+				for (int i = 0; i < tagsArray.length(); i++) {
+					tagsList.add(tagsArray.getString(i));
+				}
 			device.setTags(tagsList.toArray(new String[tagsArray.length()]));
 		}
 
@@ -61,5 +74,4 @@ public class BasicDeviceJsonParser implements JsonObjectParser<Device> {
 
 	}
 
-	
 }

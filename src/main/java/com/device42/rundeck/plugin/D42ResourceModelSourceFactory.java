@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Properties;
 /**
  * Generated the ResourceModelSource entity after setting up the parameters inside the configuration
+ * 
  * @author yunusdawji
  *
  */

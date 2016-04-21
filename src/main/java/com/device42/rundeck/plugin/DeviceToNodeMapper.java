@@ -2,7 +2,6 @@ package com.device42.rundeck.plugin;
 
 import com.device42.client.model.Device;
 import com.device42.client.model.IP;
-import com.device42.client.services.Device42ClientFactory;
 import com.device42.client.services.DevicesRestClient;
 import com.device42.client.services.parameters.DeviceParameters;
 import com.dtolabs.rundeck.core.common.INodeEntry;
@@ -22,7 +21,9 @@ import java.util.concurrent.*;
 
 /**
  * Class needed to convert the list of the devices to the set of the nodes.
- * Created by yunusdawji on 2016-02-22.
+ * Created on 2016-02-22.
+ * 
+ * @author yunusdawji
  */
 public class DeviceToNodeMapper {
 	/**
@@ -146,22 +147,31 @@ public class DeviceToNodeMapper {
 	 * Collect the list of the devices from the Device REST API library
 	 */
 	private List<Device> query() {
-		DevicesRestClient client;
+		DevicesRestClient client = null;
 		try {
-			client = Device42ClientFactory.createDeviceClient(apiUrl, username, password);
-			logger.warn(filterParams.size() + "\n");
+			client = DevicesRestClient.createDeviceClient(apiUrl, username, password);
 			return client
 					.getAllDevices(new DeviceParameters.DeviceParametersBuilder().parameterAll(filterParams).build());
 		} catch (URISyntaxException e) {
 			logger.error("URL is malformed", e);
 			return null;
+		} finally {
+			if (client != null)
+				try {
+					client.close();
+				} catch (Exception e) {
+					logger.warn("Couldn't close http client");
+				}
 		}
 
 	}
 
 	/**
-	 * Convert the Device from Device42 application into Node of Rundesk application
-	 * @param device Device from Device42 application
+	 * Convert the Device from Device42 application into Node of Rundesk
+	 * application
+	 * 
+	 * @param device
+	 *            Device from Device42 application
 	 * @return Node entry from Rundesk application
 	 */
 	INodeEntry deviceToNode(final Device device) {
@@ -185,11 +195,11 @@ public class DeviceToNodeMapper {
 			}
 
 		} else {*/
-			// no ip so lets use the node name instead
+		// no ip so lets use the node name instead
 			node.setHostname(device.getName());
 			node.setNodename(device.getName());
 		//}
-
+		
 		node.setOsName(device.getOs());
 		node.setOsVersion(device.getOsVer());
 		node.setTags(new HashSet<String>(Arrays.asList(device.getTags())));
@@ -214,14 +224,18 @@ public class DeviceToNodeMapper {
 		}
 		return node;
 	}
-	
+
 	/**
-	 * Add the attribute to the node entry if key and value are properly set. 
-	 * The attribute is being prefixed with the D42 prefix to identify
-	 * Device42 attributes from the other Node attributes.
-	 * @param node The node to add the attribute to
-	 * @param key The key of the attribute. If empty - will be ignored 
-	 * @param value The value of the attribute. If empty - will be ignored.
+	 * Add the attribute to the node entry if key and value are properly set.
+	 * The attribute is being prefixed with the D42 prefix to identify Device42
+	 * attributes from the other Node attributes.
+	 * 
+	 * @param node
+	 *            The node to add the attribute to
+	 * @param key
+	 *            The key of the attribute. If empty - will be ignored
+	 * @param value
+	 *            The value of the attribute. If empty - will be ignored.
 	 */
 	private void setNodeAttribute(NodeEntryImpl node, String key, String value) {
 
@@ -240,7 +254,9 @@ public class DeviceToNodeMapper {
 
 	/**
 	 * Set the map of "filter=value" filters
-	 * @param filterParams the filtering map
+	 * 
+	 * @param filterParams
+	 *            the filtering map
 	 */
 	public void setFilterParams(final HashMap<String, String> filterParams) {
 
