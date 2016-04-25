@@ -65,7 +65,7 @@ public class D42ResourceModelSource implements ResourceModelSource {
 	 * The lifetime of the cache. If the time after the last scan exceeds this
 	 * period the rescan is being ordered. In milliseconds.
 	 */
-	long refreshInterval = 30000;
+	long refreshInterval = 0;
 	/**
 	 * The last time when the devices were collected. The linux time
 	 * representation.
@@ -100,11 +100,11 @@ public class D42ResourceModelSource implements ResourceModelSource {
 
 		this.apiUrl = configuration.getProperty(D42ResourceModelSourceFactory.SERVER_URL);
 
-		int refreshSecs = 30;
+		int refreshSecs = 0;
 		final String refreshStr = configuration.getProperty(D42ResourceModelSourceFactory.REFRESH_INTERVAL);
 		// Apply the refresh interval if exists. If not - we are getting default
-		// value of 30 seconds
-		if (null != refreshStr && !"".equals(refreshStr)) {
+		// value of 0 seconds (cache is off)
+		if (StringUtils.isNotBlank(refreshStr)) {
 			try {
 				refreshSecs = Integer.parseInt(refreshStr);
 			} catch (NumberFormatException e) {
@@ -158,11 +158,11 @@ public class D42ResourceModelSource implements ResourceModelSource {
 			}
 			return iNodeSet;
 		}
-		if (lastRefresh > 0 && null == futureResult) {
+		if (lastRefresh > 0 && null == futureResult && refreshInterval > 0) {
 			futureResult = mapper.performQueryAsync();
 			lastRefresh = System.currentTimeMillis();
-		} else if (lastRefresh < 1) {
-			// always perform synchronous query the first time
+		} else if (lastRefresh < 1 || refreshInterval <= 0) {
+			// always perform synchronous query the first time or when cache is off
 			iNodeSet = mapper.performQuery();
 			lastRefresh = System.currentTimeMillis();
 		}
@@ -194,7 +194,7 @@ public class D42ResourceModelSource implements ResourceModelSource {
 	 * interval
 	 */
 	private boolean needsRefresh() {
-		return refreshInterval < 0 || (System.currentTimeMillis() - lastRefresh > refreshInterval);
+		return refreshInterval <= 0 || (System.currentTimeMillis() - lastRefresh > refreshInterval);
 	}
 
 	/**

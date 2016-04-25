@@ -2,6 +2,8 @@
 *.ipr
 *.iml
 *.iws
+.project
+.classpath
 build/
 /bin/
 

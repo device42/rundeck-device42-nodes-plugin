@@ -87,7 +87,7 @@ public class D42ResourceModelSourceFactory implements ResourceModelSourceFactory
 				.name(PROVIDER_NAME)
 				.title("Rundeck Resources")
 				.description("Devices from d42")
-				.property(PropertyUtil.string(SERVER_URL, "API Url", "", false, null))
+				.property(PropertyUtil.string(SERVER_URL, "D42 URL", "", false, null))
 				.property(PropertyUtil.string(USERNAME, "Username", "D42 console username", false, null))
 				.property(
 						PropertyUtil.string(
@@ -101,7 +101,7 @@ public class D42ResourceModelSourceFactory implements ResourceModelSourceFactory
 								Collections.singletonMap("displayType",
 										(Object) StringRenderingConstants.DisplayType.PASSWORD)))
 				.property(PropertyUtil.integer(REFRESH_INTERVAL, "Refresh Interval",
-						"Minimum time in seconds between API requests to Device42 (default is 30)", false, "30",
+						"Minimum time in seconds between API requests to Device42 (default is off)", false, "0",
 						new PropertyValidator() {
 							public boolean isValid(final String value) throws ValidationException {
 								try {
