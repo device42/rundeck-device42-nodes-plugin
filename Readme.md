@@ -28,7 +28,7 @@ Alternatively you can build the plugin using Gradle by running the gradlew scrip
 # Configuration #
 
 To setup the filter, add a new Rundeck resource to the project you are on through Configuration and select “Devices from D42”. Enter your Device42 url and credentials, and then you can enter filter values. 
-We’ve included some common filters: tags, os, service_level, and customer, but you can also enter any Device42 API endpoint as a filter including custom fields. For a full list please visit [Device42 API Page)[http://api.device42.com/#devices]
+We’ve included some common filters: tags, os, service_level, and customer, but you can also enter any Device42 API endpoint as a filter including custom fields. For a full list please visit [Device42 API Page)(http://api.device42.com/#devices).
 
 # Working with Device42 nodes in Rundeck #
 
