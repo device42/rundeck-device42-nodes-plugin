@@ -2,7 +2,7 @@
 
 D42Rundesk Resource plugin (D42 Rundesk Nodes plugin) allows to collect nodesets from the Device42 instance and set them up as the node sets for the particular projects.
 You can use Device42 filtering option to limit the amount of devices collected for the project.
-If you wish to use smart filters for the specific jobs feel free to use the default filtering mechanizm of the Rundeck - all collected Device42 attributes are stored as Node properties, tags or attributes.
+If you wish to use smart filters for the specific jobs feel free to use the default filtering mechanism of the Rundeck - all collected Device42 attributes are stored as Node properties, tags or attributes.
 
 # Download #
 
