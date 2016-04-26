@@ -11,6 +11,7 @@ For Windows run `gradlew.bat`
 
 For Linux run `gradlew`
 
+After the build completes, the compiled jar file can be found in the build/libs sub-directory under the plugin directory gradlew was executed from.
 The pom file is irrelative to the build, maven cannot be used to build the plugin in this version.
 
 Gradle uses the smart versioning system. If you want to change the version - check [Axion Release plugin documentation](http://axion-release-plugin.readthedocs.org/en/latest/) for details.
