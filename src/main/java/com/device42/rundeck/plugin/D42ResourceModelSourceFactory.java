@@ -101,16 +101,14 @@ public class D42ResourceModelSourceFactory implements ResourceModelSourceFactory
 								Collections.singletonMap("displayType",
 										(Object) StringRenderingConstants.DisplayType.PASSWORD)))
 				.property(PropertyUtil.integer(REFRESH_INTERVAL, "Refresh Interval",
-						"Minimum time in seconds between API requests to Device42 (default is off)", false, "0",
+						"Minimum time in seconds between API requests to Device42 (default is off)", false, null,
 						new PropertyValidator() {
 							public boolean isValid(final String value) throws ValidationException {
 								try {
 									if (null == value || value.length() == 0)
 										return true;
-									int num = Integer.parseInt(value);
-									if (num <= 0)
-										throw new ValidationException(D42ResourceModelSourceFactory.REFRESH_INTERVAL
-												+ " value is not valid: " + value);
+									Integer.parseInt(value);
+									
 								} catch (NumberFormatException e) {
 									throw new ValidationException(D42ResourceModelSourceFactory.REFRESH_INTERVAL
 											+ " value is not valid: " + value);
